@@ -10,15 +10,13 @@ import {
 // Types
 
 export type DatabaseSchema = {
-  status: Status
+  bookmarks: Bookmark
   auth_session: AuthSession
   auth_state: AuthState
 }
 
-export type Status = {
-  uri: string
-  authorDid: string
-  status: string
+export type Bookmark = {
+  subject: string
   createdAt: string
   indexedAt: string
 }
@@ -50,10 +48,8 @@ const migrationProvider: MigrationProvider = {
 migrations['001'] = {
   async up(db: Kysely<unknown>) {
     await db.schema
-      .createTable('status')
-      .addColumn('uri', 'varchar', (col) => col.primaryKey())
-      .addColumn('authorDid', 'varchar', (col) => col.notNull())
-      .addColumn('status', 'varchar', (col) => col.notNull())
+      .createTable('bookmarks')
+      .addColumn('subject', 'varchar', (col) => col.primaryKey())
       .addColumn('createdAt', 'varchar', (col) => col.notNull())
       .addColumn('indexedAt', 'varchar', (col) => col.notNull())
       .execute()
@@ -71,7 +67,7 @@ migrations['001'] = {
   async down(db: Kysely<unknown>) {
     await db.schema.dropTable('auth_state').execute()
     await db.schema.dropTable('auth_session').execute()
-    await db.schema.dropTable('status').execute()
+    await db.schema.dropTable('bookmarks').execute()
   },
 }
 

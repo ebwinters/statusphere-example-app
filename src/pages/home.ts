@@ -1,4 +1,4 @@
-import type { Status } from '#/db'
+import type { CommunityLexiconBookmarksBookmark } from '@lexicon-community/types'
 import { html } from '../lib/view'
 import { shell } from './shell'
 
@@ -35,10 +35,8 @@ const STATUS_OPTIONS = [
 ]
 
 type Props = {
-  statuses: Status[]
-  didHandleMap: Record<string, string>
+  bookmarks: CommunityLexiconBookmarksBookmark.Record[]
   profile?: { displayName?: string }
-  myStatus?: Status
 }
 
 export function home(props: Props) {
@@ -48,12 +46,12 @@ export function home(props: Props) {
   })
 }
 
-function content({ statuses, didHandleMap, profile, myStatus }: Props) {
+function content({ bookmarks, profile }: Props) {
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
-      <h1>Statusphere</h1>
-      <p>Set your status on the Atmosphere.</p>
+      <h1>Bookmarkphere</h1>
+      <p>Set your Bookmark on the Atmosphere.</p>
     </div>
     <div class="container">
       <div class="card">
@@ -75,32 +73,19 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
             </div>`}
       </div>
       <form action="/status" method="post" class="status-options">
-        ${STATUS_OPTIONS.map(
-          (status) =>
-            html`<button
-              class=${myStatus?.status === status
-                ? 'status-option selected'
-                : 'status-option'}
-              name="status"
-              value="${status}"
-            >
-              ${status}
-            </button>`
-        )}
+        <button>
+          <span>Make bookmark?</span>
+        </button>
       </form>
-      ${statuses.map((status, i) => {
-        const handle = didHandleMap[status.authorDid] || status.authorDid
-        const date = ts(status)
+      ${bookmarks.map((bookmark, i) => {
+        const date = ts(bookmark)
         return html`
           <div class=${i === 0 ? 'status-line no-line' : 'status-line'}>
             <div>
-              <div class="status">${status.status}</div>
+              <div class="bookmark">${bookmark.subject}</div>
             </div>
             <div class="desc">
-              <a class="author" href=${toBskyLink(handle)}>@${handle}</a>
-              ${date === TODAY
-                ? `is feeling ${status.status} today`
-                : `was feeling ${status.status} on ${date}`}
+            ${`you bookmarked ${bookmark.subject} on ${date}`}
             </div>
           </div>
         `
@@ -113,9 +98,7 @@ function toBskyLink(did: string) {
   return `https://bsky.app/profile/${did}`
 }
 
-function ts(status: Status) {
-  const createdAt = new Date(status.createdAt)
-  const indexedAt = new Date(status.indexedAt)
-  if (createdAt < indexedAt) return createdAt.toDateString()
-  return indexedAt.toDateString()
+function ts(bookmark: CommunityLexiconBookmarksBookmark.Record) {
+  const createdAt = new Date(bookmark.createdAt)
+  createdAt.toDateString()
 }
